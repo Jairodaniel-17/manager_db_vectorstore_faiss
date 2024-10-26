@@ -1,0 +1,17 @@
+requests 
+fastapi 
+langchain 
+langchain-core 
+langchain-openai 
+langchain-community 
+langchain-huggingface
+faiss-cpu 
+duckduckgo-search
+uvicorn
+einops
+python-multipart
+docx2txt
+aiofiles
+pdfplumber 
+python-docx
+sentence-transformers
