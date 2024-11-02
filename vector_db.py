@@ -12,11 +12,13 @@ from document_processor import DocumentProcessor
 class VectorStoreManager:
     def __init__(self, path: str, name: str, embeddings: Embeddings):
         """
-        Descripción: Clase para gestionar el vectorstore, incluyendo la creación, eliminación y búsqueda de documentos similares.
+        Descripción: Clase para gestionar el vectorstore, incluyendo la creación, eliminación y búsqueda de
+        documentos similares.
 
         Parámetros:
-        - path: str - ruta del directorio que contiene los documentos (usualmente es "database" que es el directorio donde se almacenan las bases de datos).
-        - name: str - nombre del vectorstore. (usualmente es el nombre de la base de datos que contiene los documentos).
+        - path: str - ruta del directorio que contiene los documentos (usualmente es "database" que es el directorio
+        donde se almacenan las bases de datos).
+        - name: str - nombre del vectorstore. (usualmente, es el nombre de la base de datos que contiene los documentos)
         - embeddings: Embeddings - modelo de embeddings para el vectorstore.
 
         """
@@ -96,21 +98,22 @@ class VectorStoreManager:
         return texts
 
     def save_text_to_file_temp(self, source: str) -> bool:
+        texts = self.extract_texts_by_source(source)
+        carpeta = "temp"
+        target_source_safe = source.replace("\\", "_").replace("/", "_")
+        file_path = os.path.join(carpeta, target_source_safe + ".txt")
+
         try:
-            texts = self.extract_texts_by_source(source)
-            carpeta = "temp"
             if os.path.exists(carpeta):
                 shutil.rmtree(carpeta)
             os.makedirs(carpeta)
-            target_source_safe = source.replace("\\", "_").replace("/", "_")
-            file_path = os.path.join(carpeta, target_source_safe + ".txt")
 
             with open(file_path, "w", encoding="utf-8") as file:
                 for text in texts:
                     file.write(text)
                     file.write("\n")
             return True
-        except Exception:
+        except Exception as e:
             return False
 
     def load_vectorstore(self) -> FAISS:

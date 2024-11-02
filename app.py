@@ -115,26 +115,6 @@ async def list_sources(list_request: ListSourcesRequest = Depends()):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# class TextsBySourceRequest(BaseModel):
-#     nombre_db_vectorial: str
-#     fuente: str
-
-
-# @app.get("/vectorstore/texts_by_source", tags=["Texts by Source"])
-# async def extract_texts_by_source(texts_request: TextsBySourceRequest = Depends()):
-#     """Extrae textos de una fuente específica del vectorstore.
-#     Se requiere el nombre de la base de datos vectorial y la fuente de los documentos.
-#     """
-#     try:
-#         manager = VectorStoreManager(
-#             path=path_db, name=texts_request.nombre_db_vectorial, embeddings=embeddings
-#         )
-#         texts = manager.extract_texts_by_source(source=texts_request.fuente)
-#         return {"texts": texts}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
-
-
 class SaveTempRequest(BaseModel):
     nombre_db_vectorial: str
     fuente: str
