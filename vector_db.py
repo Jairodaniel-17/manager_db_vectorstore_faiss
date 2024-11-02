@@ -1,6 +1,7 @@
 import os
 from typing import Optional, List
 import shutil
+from zipfile import ZipFile
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.embeddings import Embeddings
@@ -64,10 +65,10 @@ class VectorStoreManager:
         if fuente:
             filtro = {"source": fuente}
             retriever = self.vectorstore.similarity_search(
-                query=query, k=3, filter=filtro
+                query=query, k=5, filter=filtro
             )
         else:
-            retriever = self.vectorstore.similarity_search(query=query, k=20)
+            retriever = self.vectorstore.similarity_search(query=query, k=5)
         return str(retriever)
 
     def list_sources(self) -> List[str]:
@@ -137,3 +138,11 @@ class VectorStoreManager:
         self.vectorstore.add_documents(documents=texts)
         self.vectorstore.save_local(folder_path=os.path.join("database", self.name))
         return self.vectorstore
+
+    def download_vectorstore(self):
+        # generar un zip de la carpeta del vectorstore, crearlo en la carpeta temp y devolver la ruta
+        with ZipFile("temp/vectorstore.zip", "w") as zip:
+            for root, dirs, files in os.walk(f"database/{self.name}"):
+                for file in files:
+                    zip.write(os.path.join(root, file))
+        return "temp/vectorstore.zip"

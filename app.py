@@ -1,13 +1,22 @@
 from fastapi import FastAPI, Form, HTTPException, Depends, File, UploadFile, Body
 from typing import Optional, List
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import urllib
 from embeddings import EmbeddingManager
 from vector_db import VectorStoreManager
 import os
 import shutil
+from starlette.responses import RedirectResponse
 
 app = FastAPI()
+
+
+# pagina de inicio se redirige a la documentación de la API
+@app.get("/")
+async def redirect_to_docs():
+    return RedirectResponse(url="/docs")
+
 
 # Crear una sola instancia de EmbeddingManager
 embedding_manager = EmbeddingManager()
@@ -201,3 +210,30 @@ async def delete_vectorstore(delete_request: DeleteVectorStoreRequest = Depends(
         return {"message": "Failed to delete vectorstore."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# descargar la base de datos vectorial en formato zip
+class DownloadVectorStoreRequest(BaseModel):
+    nombre_db_vectorial: str
+
+
+@app.post("/vectorstore/download", tags=["Download VectorStore"])
+async def download_vectorstore(
+    download_request: DownloadVectorStoreRequest = Depends(),
+):
+    try:
+        manager = VectorStoreManager(
+            path=path_db,
+            name=download_request.nombre_db_vectorial,
+            embeddings=embeddings,
+        )
+        zip_path = manager.download_vectorstore()
+        return FileResponse(zip_path, filename="vectorstore.zip")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="localhost", port=8001)
